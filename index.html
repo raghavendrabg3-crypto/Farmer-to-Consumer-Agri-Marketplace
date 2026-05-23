@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer-to-Consumer Agri Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1b5e20;
+            --primary-light: #2e7d32;
+            --primary-accent: #4caf50;
+            --primary-gradient: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+            --bg-gradient: linear-gradient(135deg, #f4f7f5 0%, #e8efe9 100%);
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-orange: #f59e0b;
+            --accent-blue: #0ea5e9;
+            --accent-red: #ef4444;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(27,94,32,0.1), 0 10px 10px -5px rgba(27,94,32,0.04);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            padding: 14px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            box-shadow: var(--shadow-sm);
+        }
+
+        header h1 { 
+            font-size: 20px; 
+            font-weight: 700; 
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header-controls { display: flex; align-items: center; gap: 15px; }
+        
+        #userBadge {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 30px;
+            background: #f1f5f9;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .logout-btn {
+            background: transparent;
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 7px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 600;
+            display: none;
+            transition: var(--transition);
+        }
+        .logout-btn:hover { background-color: #fef2f2; border-color: var(--accent-red); }
+
+        .app-screen { display: none !important; width: 100%; height: calc(100vh - 67px); }
+        .app-screen.active { display: flex !important; }
+        #customerScreen.active { display: flex !important; flex-direction: column; }
+
+        /* Login Screen Layout */
+        #loginScreen { justify-content: center; align-items: center; }
+        .login-card { background: var(--surface); padding: 45px; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); width: 100%; max-width: 460px; text-align: center; }
+        .login-card h2 { color: #0f172a; margin-bottom: 8px; font-size: 26px; font-weight: 700; }
+        .login-card p { color: var(--text-muted); font-size: 14px; margin-bottom: 35px; }
+        .role-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; width: 100%; padding: 18px; margin-bottom: 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; background: #fafafa; transition: var(--transition); }
+        .role-btn span { font-size: 12px; font-weight: 400; color: var(--text-muted); }
+        .role-btn.farmer { color: var(--primary-light); }
+        .role-btn.farmer:hover { border-color: var(--primary-accent); background-color: #f0fdf4; transform: translateY(-2px); }
+        .role-btn.customer { color: var(--accent-blue); }
+        .role-btn.customer:hover { border-color: var(--accent-blue); background-color: #f0f9ff; transform: translateY(-2px); }
+
+        /* Workspaces Grid layout setups */
+        .farmer-workspace { display: grid; grid-template-columns: 380px 1fr; width: 100%; }
+        .sidebar { background-color: var(--surface); border-right: 1px solid var(--border-color); padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 25px; }
+        .sidebar h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px solid #f1f5f9; }
+        .main-panel { padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 35px; width: 100%; }
+        .main-panel h2 { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 15px; border-left: 4px solid var(--primary-light); padding-left: 10px; }
+
+        #customerScreen { padding: 40px; overflow-y: auto; }
+        #customerScreen h2 { font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 25px; }
+
+        .form-group { margin-bottom: 14px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #334155; }
+        input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 13px; background-color: #f8fafc; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-light); background-color: var(--surface); box-shadow: 0 0 0 3px rgba(46,125,50,0.1); }
+        
+        button.action-btn { width: 100%; background: var(--primary-gradient); color: white; border: none; padding: 12px; font-size: 14px; font-weight: 600; border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); }
+        button.action-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(27,94,32,0.2); }
+
+        .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+        .card { background: var(--surface); border: 1px solid rgba(226, 232, 240, 0.7); padding: 24px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); transition: var(--transition); display: flex; flex-direction: column; }
+        .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+        .farmer-card { border-top: 4px solid var(--primary-light); }
+        .product-card { border-top: 4px solid var(--accent-orange); }
+        .order-card { border-top: 4px solid var(--accent-blue); }
+        
+        .card h3 { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 12px; }
+        .card p { font-size: 13px; margin-bottom: 8px; color: #475569; }
+        .card-meta { margin-top: auto; padding-top: 15px; border-top: 1px solid #f1f5f9; }
+        .tag { background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block; margin-right: 4px; margin-bottom: 4px; }
+        .price-badge { font-size: 20px; font-weight: 700; color: var(--accent-orange); margin: 8px 0; }
+        
+        .btn-order { background: var(--primary-gradient); color: white; border: none; padding: 10px; font-weight: 600; border-radius: var(--radius-sm); cursor: pointer; width: 100%; transition: var(--transition); }
+        .btn-confirm { background: linear-gradient(135deg, #0ea5e9 0%, #0288d1 100%); color: white; border: none; padding: 8px; font-weight: 600; border-radius: var(--radius-sm); cursor: pointer; margin-top: 12px; width: 100%; }
+
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 30px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .status-pending { background-color: #fef3c7; color: #d97706; }
+        .status-confirmed { background-color: #dcfce7; color: #15803d; }
+
+        /* Standalone overlay layout configuration tags */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 99999 !important; opacity: 0; pointer-events: none; transition: var(--transition); }
+        .modal-overlay.active { opacity: 1 !important; pointer-events: auto !important; }
+        .modal-box { background: var(--surface); padding: 32px; border-radius: var(--radius-lg); width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); position: relative; border: 1px solid var(--border-color); }
+        .modal-box h3 { margin-bottom: 20px; color: #0f172a; font-weight: 700; font-size: 18px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; }
+        .close-modal { position: absolute; top: 20px; right: 20px; background: #f1f5f9; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🚜 Marketplace Hub</h1>
+        <div class="header-controls">
+            <span id="userBadge"></span>
+            <button class="logout-btn" id="logoutBtn">Switch Platform Role</button>
+        </div>
+    </header>
+
+    <div id="loginScreen" class="app-screen active">
+        <div class="login-card">
+            <h2>Agri Marketplace Portal</h2>
+            <p>Select your entry workspace to discover products or track regional farm accounts</p>
+            <button class="role-btn farmer" id="loginAsFarmer">
+                <strong>🌾 Farmer Management Node</strong>
+                <span>Register nodes, post crops, and fulfill pipeline metrics</span>
+            </button>
+            <button class="role-btn customer" id="loginAsCustomer">
+                <strong>🛒 Consumer Marketplace</strong>
+                <span>Browse current open listings and order fresh crops directly</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="farmerScreen" class="app-screen">
+        <div class="farmer-workspace">
+            <div class="sidebar">
+                <div>
+                    <h2>1. Register Farmer Profile</h2>
+                    <form id="farmerForm">
+                        <div class="form-group"><label>Farmer Name</label><input type="text" id="farmerName" placeholder="e.g., Ramesh Gowda" required></div>
+                        <div class="form-group"><label>Location / District</label><input type="text" id="farmerAddress" placeholder="e.g., Mandya, Karnataka" required></div>
+                        <div class="form-group"><label>Primary Crop Varieties</label><input type="text" id="farmerCrops" placeholder="e.g., Ragi, Sugarcane" required></div>
+                        <div class="form-group">
+                            <label>Methodology</label>
+                            <select id="farmingMethod">
+                                <option value="Organic">Organic Farming</option>
+                                <option value="Natural">Natural Farming (ZBNF)</option>
+                                <option value="Conventional">Conventional</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="action-btn">Save Profile Node</button>
+                    </form>
+                </div>
+
+                <div>
+                    <h2>2. List Crop for Sale</h2>
+                    <form id="productForm">
+                        <div class="form-group"><label>Select Registered Farmer</label><select id="productFarmerSelect" required><option value="">-- Choose Farmer --</option></select></div>
+                        <div class="form-group"><label>Crop Item Title</label><input type="text" id="productTitle" placeholder="e.g., Premium Rice" required></div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="productCategory">
+                                <option value="Grains">Grains & Cereals</option>
+                                <option value="Vegetables">Vegetables</option>
+                                <option value="Fruits">Fruits</option>
+                                <option value="Pulses">Pulses & Oilseeds</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Price per KG (INR)</label><input type="number" id="productPrice" placeholder="e.g., 60" required></div>
+                        <div class="form-group"><label>Available Stock (KG)</label><input type="number" id="productStock" placeholder="e.g., 500" required></div>
+                        <button type="submit" class="action-btn">Post Crop Item</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="main-panel">
+                <div>
+                    <h2>📦 Incoming Customer Orders Stream</h2>
+                    <div id="farmerOrdersContainer" class="data-grid"></div>
+                </div>
+                <div>
+                    <h2>👥 Registered Regional Farmers Directory</h2>
+                    <div id="farmersContainer" class="data-grid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="customerScreen" class="app-screen">
+        <h2>🌾 Available Regional Crops for Immediate Purchase</h2>
+        <div id="customerProductsContainer" class="data-grid"></div>
+    </div>
+
+    <div id="purchaseModal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="close-modal" id="closeModalBtn">×</button>
+            <h3 id="modalCropTitle">Checkout Order</h3>
+            <form id="orderForm">
+                <input type="hidden" id="modalProductId">
+                <div class="form-group"><label>Your Full Name</label><input type="text" id="orderConsumerName" placeholder="Enter your full name" required></div>
+                <div class="form-group"><label>Contact Mobile Number</label><input type="text" id="orderConsumerPhone" placeholder="Enter mobile number" required></div>
+                <div class="form-group"><label>Full Delivery Shipping Address</label><textarea id="orderDeliveryAddress" rows="2" placeholder="Enter complete home shipping address" required></textarea></div>
+                <div class="form-group"><label>Purchase Weight Quantity (in KG)</label><input type="number" id="orderQuantity" placeholder="e.g., 25" min="1" required></div>
+                <button type="submit" class="action-btn">Place Order Request</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
