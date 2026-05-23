@@ -24,10 +24,15 @@ agri-marketplace/
 ├── public/                 # Static Frontend Presentation Assets
 │   ├── index.html          # Core App Structural View Layout
 │   └── app.js              # Frontend UI Interaction & Async API Logic
-├── routes/
-│   ├── farmerRoutes.js     # Router Logic for Managing Profiles & Data Writes
-│   ├── productRoutes.js    # Router Logic for Core Crop Inventory & Storefronts
-│   └── orderRoutes.js      # Router Logic for Handling Checkout & Stock Updates
+├── src/                    # Source folder to keep backend modular
+│   ├── controllers/        # NEW: Holds data handling & business logic
+│   │   ├── farmerController.js
+│   │   ├── productController.js
+│   │   └── orderController.js
+│   └── routes/             # Cleaner routing gates
+│       ├── farmerRoutes.js
+│       ├── productRoutes.js
+│       └── orderRoutes.js
 ├── server.js               # Main Core Server Application Entry Script
 ├── package.json            # Project Dependencies Registry
 └── README.md               # Project Landing Manual Runbook
